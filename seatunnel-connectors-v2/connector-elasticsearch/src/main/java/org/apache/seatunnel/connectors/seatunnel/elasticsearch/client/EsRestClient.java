@@ -56,6 +56,7 @@ import lombok.extern.slf4j.Slf4j;
 import javax.net.ssl.SSLContext;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -241,7 +242,7 @@ public class EsRestClient {
             }
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 ObjectMapper objectMapper = new ObjectMapper();
-                String entity = EntityUtils.toString(response.getEntity());
+                String entity = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
                 JsonNode json = objectMapper.readTree(entity);
                 int took = json.get("took").asInt();
                 boolean errors = json.get("errors").asBoolean();
@@ -265,7 +266,7 @@ public class EsRestClient {
         Request request = new Request("GET", "/");
         try {
             Response response = restClient.performRequest(request);
-            String result = EntityUtils.toString(response.getEntity());
+            String result = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonNode = objectMapper.readTree(result);
             JsonNode versionNode = jsonNode.get("version");
@@ -343,7 +344,7 @@ public class EsRestClient {
                         "POST " + endpoint + " response null");
             }
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                String entity = EntityUtils.toString(response.getEntity());
+                String entity = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
                 ObjectNode responseJson = JsonUtils.parseObject(entity);
 
                 JsonNode shards = responseJson.get("_shards");
@@ -414,7 +415,7 @@ public class EsRestClient {
                         "GET " + endpoint + " response null");
             }
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                String entity = EntityUtils.toString(response.getEntity());
+                String entity = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
                 List<IndexDocsCount> indexDocsCounts =
                         JsonUtils.toList(entity, IndexDocsCount.class);
                 return indexDocsCounts;
@@ -442,7 +443,7 @@ public class EsRestClient {
                         "GET " + endpoint + " response null");
             }
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                String entity = EntityUtils.toString(response.getEntity());
+                String entity = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
                 return JsonUtils.toList(entity, Map.class).stream()
                         .map(map -> map.get("index").toString())
                         .collect(Collectors.toList());
@@ -533,7 +534,7 @@ public class EsRestClient {
                                 "GET %s response status code=%d",
                                 endpoint, response.getStatusLine().getStatusCode()));
             }
-            String entity = EntityUtils.toString(response.getEntity());
+            String entity = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
             log.info(String.format("GET %s respnse=%s", endpoint, entity));
             ObjectNode responseJson = JsonUtils.parseObject(entity);
             for (Iterator<JsonNode> it = responseJson.elements(); it.hasNext(); ) {
