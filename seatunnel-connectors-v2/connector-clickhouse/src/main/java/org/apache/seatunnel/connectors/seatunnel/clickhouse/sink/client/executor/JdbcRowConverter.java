@@ -71,6 +71,10 @@ public class JdbcRowConverter implements Serializable {
             if (fieldValue == null) {
                 // field does not exist in row
                 // todo: do we need to transform to default value of each type
+                if (fieldInjectFunctionMap.get(fieldName) instanceof StringInjectFunction) {
+                    statement.setString(i + 1, "");
+                    continue;
+                }
                 statement.setObject(i + 1, null);
                 continue;
             }
